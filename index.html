@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Pexiora Poker Club</title>
+<title>Durfort Poker Club</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <link rel="manifest" href="manifest.json">
@@ -55,7 +55,7 @@ input, button, select {
 
 <img src="logo.png" class="logo">
 
-<h2>PEXIORA POKER CLUB</h2>
+<h2>DURFORT POKER CLUB</h2>
 
 <div id="compteur">Chargement...</div>
 
@@ -102,7 +102,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyDANUdOf2ui5gfuvdOMPfOX_SVaEcoT7-8",
   authDomain: "pexiora-poker-inscriptrions.firebaseapp.com",
   databaseURL: "https://pexiora-poker-inscriptrions-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "pexiora-poker-inscriptrions"
+  projectId: "Durfort-poker-inscriptrions"
 };
 
 firebase.initializeApp(firebaseConfig);
@@ -111,7 +111,7 @@ const ref = firebase.database().ref("joueurs");
 const configRef = firebase.database().ref("config");
 
 let joueurs = [];
-let places = 64;
+let places = 56;
 
 ref.on("value", snap => {
     joueurs = snap.val() || [];
@@ -187,7 +187,7 @@ function changerPlaces() {
     let code = document.getElementById("adminCode").value;
     let nb = parseInt(document.getElementById("nbPlaces").value);
 
-    if (code !== "pexiora2026" && code !== "julien2026") {
+    if (code !== "guyane2026" && code !== "drosera2026") {
         alert("Code incorrect");
         return;
     }
