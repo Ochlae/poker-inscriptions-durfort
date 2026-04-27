@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Pexiora Poker Club</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.png">
+<link rel="apple-touch-icon" href="icon.png">
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #0b1a0b;
+    color: white;
+    text-align: center;
+    margin: 0;
+}
+.container {
+    max-width: 600px;
+    margin: auto;
+    padding: 12px;
+}
+.logo { width: 120px; }
+input, button, select {
+    width: 90%;
+    padding: 14px;
+    margin: 6px;
+    border-radius: 8px;
+    border: none;
+    font-size: 16px;
+}
+.inscrire { background: green; color: white; }
+.desinscrire { background: red; color: white; }
+.admin { background: #444; color: white; }
+#compteur {
+    font-size: 20px;
+    color: gold;
+    margin: 15px;
+}
+#liste, #attente, #mesJoueurs {
+    text-align: left;
+    background: #162816;
+    padding: 12px;
+    border-radius: 8px;
+    margin: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<img src="logo.png" class="logo">
+
+<h2>PEXIORA POKER CLUB</h2>
+
+<div id="compteur">Chargement...</div>
+
+<input id="nom" placeholder="Pseudo à inscrire">
+
+<button class="inscrire" onclick="inscrire()">Inscrire ce joueur</button>
+
+<h3>Mes joueurs inscrits depuis cet appareil</h3>
+<div id="mesJoueurs">Aucun</div>
+
+<select id="selectDesinscrire">
+    <option value="">Choisir un joueur à désinscrire</option>
+</select>
+
+<button class="desinscrire" onclick="desinscrire()">Désinscrire le joueur choisi</button>
+
+<h3>Inscrits</h3>
+<div id="liste"></div>
+
+<h3>Attente</h3>
+<div id="attente"></div>
+
+<hr>
+
+<h3>Admin</h3>
+
+<input type="password" id="adminCode" placeholder="Code admin">
+<input type="number" id="nbPlaces" placeholder="Nombre de places">
+
+<button class="admin" onclick="changerPlaces()">Mettre à jour les places</button>
+<button class="admin" onclick="resetTournoi()">Réinitialiser tournoi</button>
+<button class="admin" onclick="exporter()">Exporter la liste</button>
+
+<input id="pseudoSupprimer" placeholder="Pseudo à supprimer par admin">
+<button class="admin" onclick="supprimerJoueur()">Supprimer un joueur</button>
+
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyDANUdOf2ui5gfuvdOMPfOX_SVaEcoT7-8",
+  authDomain: "pexiora-poker-inscriptrions.firebaseapp.com",
+  databaseURL: "https://pexiora-poker-inscriptrions-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "pexiora-poker-inscriptrions"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const ref = firebase.database().ref("joueurs");
+const configRef = firebase.database().ref("config");
+
+let joueurs = [];
+let places = 64;
+
+ref.on("value", snap => {
+    joueurs = snap.val() || [];
+    afficher();
+});
+
+configRef.on("value", snap => {
+    let data = snap.val();
+    if (data && data.places) places = data.places;
+    afficher();
+});
+
+function norm(n) {
+    return n.trim().toLowerCase();
+}
+
+function getMesJoueurs() {
+    return JSON.parse(localStorage.getItem("mesJoueursPoker")) || [];
+}
+
+function saveMesJoueurs(liste) {
+    localStorage.setItem("mesJoueursPoker", JSON.stringify(liste));
+}
+
+function inscrire() {
+    let nom = document.getElementById("nom").value.trim();
+
+    if (!nom) return alert("Entre un pseudo");
+
+    if (joueurs.some(j => norm(j) === norm(nom))) {
+        alert("Déjà inscrit");
+        return;
+    }
+
+    joueurs.push(nom);
+    ref.set(joueurs);
+
+    let mesJoueurs = getMesJoueurs();
+
+    if (!mesJoueurs.some(j => norm(j) === norm(nom))) {
+        mesJoueurs.push(nom);
+        saveMesJoueurs(mesJoueurs);
+    }
+
+    document.getElementById("nom").value = "";
+
+    alert("Inscription enregistrée : " + nom);
+    afficher();
+}
+
+function desinscrire() {
+    let pseudo = document.getElementById("selectDesinscrire").value;
+
+    if (!pseudo) {
+        alert("Choisis un joueur à désinscrire");
+        return;
+    }
+
+    if (!confirm("Désinscrire : " + pseudo + " ?")) return;
+
+    joueurs = joueurs.filter(j => norm(j) !== norm(pseudo));
+    ref.set(joueurs);
+
+    let mesJoueurs = getMesJoueurs();
+    mesJoueurs = mesJoueurs.filter(j => norm(j) !== norm(pseudo));
+    saveMesJoueurs(mesJoueurs);
+
+    alert("Désinscription effectuée : " + pseudo);
+    afficher();
+}
+
+function changerPlaces() {
+    let code = document.getElementById("adminCode").value;
+    let nb = parseInt(document.getElementById("nbPlaces").value);
+
+    if (code !== "pexiora2026" && code !== "julien2026") {
+        alert("Code incorrect");
+        return;
+    }
+
+    if (!nb || nb < 10 || nb > 200) {
+        alert("Nombre invalide");
+        return;
+    }
+
+    configRef.set({ places: nb });
+    alert("Nombre de places mis à jour");
+}
+
+function resetTournoi() {
+    let code = document.getElementById("adminCode").value;
+
+    if (code !== "pexiora2026" && code !== "julien2026") {
+        alert("Code incorrect");
+        return;
+    }
+
+    if (confirm("Réinitialiser le tournoi ?")) {
+        ref.set([]);
+        localStorage.removeItem("mesJoueursPoker");
+        alert("Tournoi réinitialisé");
+        afficher();
+    }
+}
+
+function supprimerJoueur() {
+    let code = document.getElementById("adminCode").value;
+    let pseudo = document.getElementById("pseudoSupprimer").value.trim();
+
+    if (code !== "pexiora2026" && code !== "julien2026") {
+        alert("Code admin incorrect");
+        return;
+    }
+
+    if (!pseudo) return alert("Entre un pseudo à supprimer");
+
+    if (!confirm("Supprimer : " + pseudo + " ?")) return;
+
+    joueurs = joueurs.filter(j => norm(j) !== norm(pseudo));
+    ref.set(joueurs);
+
+    alert(pseudo + " supprimé");
+    afficher();
+}
+
+function exporter() {
+    if (joueurs.length === 0) {
+        alert("La liste est vide");
+        return;
+    }
+
+    let texte = joueurs.map((j, i) => (i + 1) + ". " + j).join("\n");
+
+    navigator.clipboard.writeText(texte)
+        .then(() => {
+            alert("Liste copiée ! Tu peux la coller dans Excel ou Bloc-notes.");
+        })
+        .catch(() => {
+            alert("Copie impossible sur cet appareil. Essaie depuis le PC.");
+        });
+}
+
+function afficherMesJoueurs() {
+    let mesJoueurs = getMesJoueurs();
+
+    document.getElementById("mesJoueurs").innerHTML =
+        mesJoueurs.map((j, i) => (i + 1) + ". " + j).join("<br>") || "Aucun";
+
+    let select = document.getElementById("selectDesinscrire");
+    select.innerHTML = '<option value="">Choisir un joueur à désinscrire</option>';
+
+    mesJoueurs.forEach(j => {
+        let option = document.createElement("option");
+        option.value = j;
+        option.textContent = j;
+        select.appendChild(option);
+    });
+}
+
+function afficher() {
+    let ins = joueurs.slice(0, places);
+    let att = joueurs.slice(places);
+
+    let txt = ins.length + " / " + places + " inscrits";
+
+    if (ins.length >= places) txt += " - COMPLET";
+
+    document.getElementById("compteur").innerText = txt;
+
+    document.getElementById("liste").innerHTML =
+        ins.map((j, i) => (i + 1) + ". " + j).join("<br>") || "Aucun inscrit";
+
+    document.getElementById("attente").innerHTML =
+        att.map((j, i) => (i + 1) + ". " + j).join("<br>") || "Aucune attente";
+
+    afficherMesJoueurs();
+}
+
+window.onload = function() {
+    afficherMesJoueurs();
+};
+</script>
+
+</body>
+</html>
