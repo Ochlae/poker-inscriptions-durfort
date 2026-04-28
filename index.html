@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Pexiora Poker Club - Test Design</title>
+<title>Durfort Poker Club - Test Design</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <link rel="manifest" href="manifest.json">
@@ -150,9 +150,9 @@ button {
 <script>
 const firebaseConfig = {
   apiKey: "AIzaSyDANUdOf2ui5gfuvdOMPfOX_SVaEcoT7-8",
-  authDomain: "pexiora-poker-inscriptrions.firebaseapp.com",
-  databaseURL: "https://pexiora-poker-inscriptrions-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "pexiora-poker-inscriptrions"
+  authDomain: "durfort-poker-inscriptions.firebaseapp.com",
+  databaseURL: "https://durfort-poker-inscriptions-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "durfort-poker-inscriptions"
 };
 
 firebase.initializeApp(firebaseConfig);
@@ -161,7 +161,7 @@ const ref = firebase.database().ref("joueurs_durfort");
 const configRef = firebase.database().ref("config_durfort");
 
 let joueurs = [];
-let places = 64;
+let places = 54;
 
 ref.on("value", snap => {
     joueurs = snap.val() || [];
@@ -179,11 +179,11 @@ function norm(n) {
 }
 
 function getMesJoueurs() {
-    return JSON.parse(localStorage.getItem("mesJoueursPokerTest")) || [];
+    return JSON.parse(localStorage.getItem("mesJoueursDurfort")) || [];
 }
 
 function saveMesJoueurs(liste) {
-    localStorage.setItem("mesJoueursPokerTest", JSON.stringify(liste));
+    localStorage.setItem("mesJoueursDurfort", JSON.stringify(liste));
 }
 
 function inscrire() {
@@ -237,7 +237,7 @@ function changerPlaces() {
     let code = document.getElementById("adminCode").value;
     let nb = parseInt(document.getElementById("nbPlaces").value);
 
-    if (code !== "guyane2026" && code !== "drosera2026") {
+    if (code !== "guyane2026") {
         alert("Code incorrect");
         return;
     }
@@ -254,14 +254,14 @@ function changerPlaces() {
 function resetTournoi() {
     let code = document.getElementById("adminCode").value;
 
-    if (code !== "pexiora2026" && code !== "julien2026") {
+    if (code !== "durfort2026") {
         alert("Code incorrect");
         return;
     }
 
     if (confirm("Réinitialiser le tournoi ?")) {
         ref.set([]);
-        localStorage.removeItem("mesJoueursPokerTest");
+        localStorage.removeItem("mesJoueursDurfort");
         alert("Tournoi réinitialisé");
         afficher();
     }
@@ -271,7 +271,7 @@ function supprimerJoueur() {
     let code = document.getElementById("adminCode").value;
     let pseudo = document.getElementById("pseudoSupprimer").value.trim();
 
-    if (code !== "pexiora2026" && code !== "julien2026") {
+    if (code !== "guyane2026") {
         alert("Code admin incorrect");
         return;
     }
