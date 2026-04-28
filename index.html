@@ -255,9 +255,9 @@ function resetTournoi() {
     let code = document.getElementById("adminCode").value;
 
     if (code !== "guyane2026") {
-        alert("Code incorrect");
-        return;
-    }
+    alert("Code incorrect");
+    return;
+}
 
     if (confirm("Réinitialiser le tournoi ?")) {
         ref.set([]);
