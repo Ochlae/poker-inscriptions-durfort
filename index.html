@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Durfort Poker Club</title>
+<title>Pexiora Poker Club - Test Design</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <link rel="manifest" href="manifest.json">
@@ -11,40 +11,87 @@
 
 <style>
 body {
-    font-family: Arial, sans-serif;
-    background: #0b1a0b;
-    color: white;
-    text-align: center;
     margin: 0;
+    font-family: Arial, sans-serif;
+    background: radial-gradient(circle at top, #173817, #050905);
+    color: white;
 }
 .container {
-    max-width: 600px;
+    max-width: 620px;
     margin: auto;
-    padding: 12px;
-}
-.logo { width: 120px; }
-input, button, select {
-    width: 90%;
     padding: 14px;
-    margin: 6px;
-    border-radius: 8px;
+}
+.logo {
+    width: 130px;
+    display: block;
+    margin: 12px auto;
+}
+h1 {
+    text-align: center;
+    color: gold;
+    margin-bottom: 5px;
+}
+.subtitle {
+    text-align: center;
+    color: #ddd;
+    margin-bottom: 18px;
+}
+.card {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 16px;
+    padding: 16px;
+    margin: 14px 0;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+}
+.card h2 {
+    margin-top: 0;
+    font-size: 20px;
+    color: gold;
+}
+input, button, select {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 14px;
+    margin: 7px 0;
+    border-radius: 10px;
     border: none;
     font-size: 16px;
 }
-.inscrire { background: green; color: white; }
-.desinscrire { background: red; color: white; }
-.admin { background: #444; color: white; }
+button {
+    font-weight: bold;
+}
+.inscrire {
+    background: #159447;
+    color: white;
+}
+.desinscrire {
+    background: #b32626;
+    color: white;
+}
+.admin {
+    background: #333;
+    color: white;
+}
 #compteur {
-    font-size: 20px;
+    text-align: center;
+    font-size: 22px;
     color: gold;
-    margin: 15px;
+    padding: 12px;
+    background: rgba(0,0,0,0.35);
+    border-radius: 14px;
+    margin-bottom: 12px;
 }
 #liste, #attente, #mesJoueurs {
     text-align: left;
-    background: #162816;
+    line-height: 1.7;
+    background: rgba(0,0,0,0.25);
     padding: 12px;
-    border-radius: 8px;
-    margin: 10px;
+    border-radius: 12px;
+}
+.small {
+    font-size: 13px;
+    color: #ccc;
 }
 </style>
 </head>
@@ -55,42 +102,45 @@ input, button, select {
 
 <img src="logo.png" class="logo">
 
-<h2>DURFORT POKER CLUB</h2>
+<h1>DURFORT POKER CLUB</h1>
+<div class="subtitle">Inscriptions tournoi</div>
 
 <div id="compteur">Chargement...</div>
 
-<input id="nom" placeholder="Pseudo à inscrire">
+<div class="card">
+    <h2>🎲 Inscription</h2>
+    <input id="nom" placeholder="Pseudo à inscrire">
+    <button class="inscrire" onclick="inscrire()">Inscrire ce joueur</button>
+    <div class="small">Vous pouvez inscrire plusieurs joueurs depuis le même appareil.</div>
+</div>
 
-<button class="inscrire" onclick="inscrire()">Inscrire ce joueur</button>
+<div class="card">
+    <h2>👥 Mes joueurs</h2>
+    <div id="mesJoueurs">Aucun</div>
+    <select id="selectDesinscrire">
+        <option value="">Choisir un joueur à désinscrire</option>
+    </select>
+    <button class="desinscrire" onclick="desinscrire()">Désinscrire le joueur choisi</button>
+</div>
 
-<h3>Mes joueurs inscrits depuis cet appareil</h3>
-<div id="mesJoueurs">Aucun</div>
+<div class="card">
+    <h2>📋 Liste du tournoi</h2>
+    <h3>Inscrits</h3>
+    <div id="liste"></div>
+    <h3>Attente</h3>
+    <div id="attente"></div>
+</div>
 
-<select id="selectDesinscrire">
-    <option value="">Choisir un joueur à désinscrire</option>
-</select>
-
-<button class="desinscrire" onclick="desinscrire()">Désinscrire le joueur choisi</button>
-
-<h3>Inscrits</h3>
-<div id="liste"></div>
-
-<h3>Attente</h3>
-<div id="attente"></div>
-
-<hr>
-
-<h3>Admin</h3>
-
-<input type="password" id="adminCode" placeholder="Code admin">
-<input type="number" id="nbPlaces" placeholder="Nombre de places">
-
-<button class="admin" onclick="changerPlaces()">Mettre à jour les places</button>
-<button class="admin" onclick="resetTournoi()">Réinitialiser tournoi</button>
-<button class="admin" onclick="exporter()">Exporter la liste</button>
-
-<input id="pseudoSupprimer" placeholder="Pseudo à supprimer par admin">
-<button class="admin" onclick="supprimerJoueur()">Supprimer un joueur</button>
+<div class="card">
+    <h2>🔐 Administration</h2>
+    <input type="password" id="adminCode" placeholder="Code admin">
+    <input type="number" id="nbPlaces" placeholder="Nombre de places">
+    <button class="admin" onclick="changerPlaces()">Mettre à jour les places</button>
+    <button class="admin" onclick="resetTournoi()">Réinitialiser tournoi</button>
+    <button class="admin" onclick="exporter()">Exporter la liste</button>
+    <input id="pseudoSupprimer" placeholder="Pseudo à supprimer par admin">
+    <button class="admin" onclick="supprimerJoueur()">Supprimer un joueur</button>
+</div>
 
 </div>
 
@@ -102,7 +152,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyDANUdOf2ui5gfuvdOMPfOX_SVaEcoT7-8",
   authDomain: "pexiora-poker-inscriptrions.firebaseapp.com",
   databaseURL: "https://pexiora-poker-inscriptrions-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "Durfort-poker-inscriptrions"
+  projectId: "pexiora-poker-inscriptrions"
 };
 
 firebase.initializeApp(firebaseConfig);
@@ -111,7 +161,7 @@ const ref = firebase.database().ref("joueurs_durfort");
 const configRef = firebase.database().ref("config_durfort");
 
 let joueurs = [];
-let places = 56;
+let places = 64;
 
 ref.on("value", snap => {
     joueurs = snap.val() || [];
@@ -129,11 +179,11 @@ function norm(n) {
 }
 
 function getMesJoueurs() {
-    return JSON.parse(localStorage.getItem("mesJoueursPoker")) || [];
+    return JSON.parse(localStorage.getItem("mesJoueursPokerTest")) || [];
 }
 
 function saveMesJoueurs(liste) {
-    localStorage.setItem("mesJoueursPoker", JSON.stringify(liste));
+    localStorage.setItem("mesJoueursPokerTest", JSON.stringify(liste));
 }
 
 function inscrire() {
@@ -187,7 +237,7 @@ function changerPlaces() {
     let code = document.getElementById("adminCode").value;
     let nb = parseInt(document.getElementById("nbPlaces").value);
 
-    if (code !== "guyane2026" && code !== "drosera2026") {
+    if (code !== "pexiora2026" && code !== "julien2026") {
         alert("Code incorrect");
         return;
     }
@@ -211,7 +261,7 @@ function resetTournoi() {
 
     if (confirm("Réinitialiser le tournoi ?")) {
         ref.set([]);
-        localStorage.removeItem("mesJoueursPoker");
+        localStorage.removeItem("mesJoueursPokerTest");
         alert("Tournoi réinitialisé");
         afficher();
     }
